@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: /snap/kompose/19/kompose-linux-amd64 convert
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mysql-db
+  name: mysql-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mysql-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: /snap/kompose/19/kompose-linux-amd64 convert
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: mysql-db
+    spec:
+      containers:
+      - env:
+        - name: API_SECRET
+          valueFrom:
+            configMapKeyRef:
+              key: API_SECRET
+              name: go-talkie-auth--env
+        - name: DB_DRIVER
+          valueFrom:
+            configMapKeyRef:
+              key: DB_DRIVER
+              name: go-talkie-auth--env
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: DB_HOST
+              name: go-talkie-auth--env
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: DB_NAME
+              name: go-talkie-auth--env
+        - name: DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: DB_PASSWORD
+              name: go-talkie-auth--env
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: DB_PORT
+              name: go-talkie-auth--env
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              key: DB_USER
+              name: go-talkie-auth--env
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: MYSQL_ALLOW_EMPTY_PASSWORD
+              name: go-talkie-auth--env
+        - name: TOKEN_HOUR_LIFESPAN
+          valueFrom:
+            configMapKeyRef:
+              key: TOKEN_HOUR_LIFESPAN
+              name: go-talkie-auth--env
+        image: mysql:latest
+        imagePullPolicy: ""
+        name: mysql-db
+        ports:
+        - containerPort: 3306
+        resources: {}
+        volumeMounts:
+        - name: mysql-initdb
+          mountPath: /docker-entrypoint-initdb.d
+        - mountPath: /var/lib/mysql
+          name: my-db
+        # - mountPath: /docker-entrypoint-initdb.d
+        #   name: mysql-db-claim
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: mysql-initdb
+        configMap:
+          name: mysql-initdb-config
+      - name: my-db
+        persistentVolumeClaim:
+          claimName: my-db
+      # - name: mysql-db-claim
+      #   persistentVolumeClaim:
+      #     claimName: mysql-db-claim
+status: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS `jwt-gin`;
+    USE `jwt-gin`;
+    CREATE TABLE IF NOT EXISTS `users` (
+    `id` int unsigned NOT NULL AUTO_INCREMENT,
+    `created_at` datetime DEFAULT NULL,
+    `updated_at` datetime DEFAULT NULL,
+    `deleted_at` datetime DEFAULT NULL,
+    `username` varchar(255) NOT NULL,
+    `password` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `username` (`username`),
+    KEY `idx_users_deleted_at` (`deleted_at`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+---
+
+
