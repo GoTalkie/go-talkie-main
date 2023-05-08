@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  API_SECRET: ""
+  DB_DRIVER: mysql
+  DB_HOST: mysql-db
+  DB_NAME: jwt-gin
+  DB_PASSWORD: ""
+  DB_PORT: "3306"
+  DB_USER: root
+  MYSQL_ALLOW_EMPTY_PASSWORD: "1"
+  TOKEN_HOUR_LIFESPAN: "1"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mysql-db-go-talkie-auth--env
+  name: go-talkie-auth--env

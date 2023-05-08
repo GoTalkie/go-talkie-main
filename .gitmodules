@@ -1,0 +1,6 @@
+[submodule "go-talkie-auth"]
+	path = go-talkie-auth
+	url = https://github.com/GoTalkie/go-talkie-auth
+[submodule "go-talkie-broker"]
+	path = go-talkie-broker
+	url = https://github.com/GoTalkie/go-talkie-broker
